@@ -21,5 +21,9 @@ export function requireClient(): SupabaseClient {
 export function toUserMessage(err: unknown): string {
   if (err instanceof Error && err.message === '서버 연결이 설정되지 않았습니다.') return err.message;
   if (typeof navigator !== 'undefined' && !navigator.onLine) return '인터넷 연결을 확인해 주세요.';
+  const code = (err as { code?: string } | null)?.code;
+  if (code === 'PGRST205' || code === '42P01') return 'DB 테이블이 아직 생성되지 않았습니다. (001_init.sql 실행 필요)';
+  if (code === '42501') return '저장 권한이 없습니다. (RLS 정책 확인 필요)';
+  if (code === '23514') return '입력값이 허용 범위를 벗어났습니다.';
   return '서버와 통신하지 못했습니다. 잠시 후 다시 시도해 주세요.';
 }
